@@ -11,7 +11,7 @@ namespace MinecraftUpdateAndSync.PublishTool
     internal class ManifestGenerator
     {
 
-        private void GenerateManifest(string directoryPath, string manifestSavePath, string version, string lastManifestFilePath = null, string[] ignoredDirectories = null)
+        public static void GenerateManifest(string directoryPath, string manifestSavePath, string version, string lastManifestFilePath = null, string[] ignoredDirectories = null)
         {
             Manifest manifest = new Manifest();
             Manifest deletedFilesManifest = new Manifest();
@@ -32,9 +32,9 @@ namespace MinecraftUpdateAndSync.PublishTool
                     Size = file.Value.Size,
                 });
             }
-            if (string.IsNullOrEmpty(lastManifestFilePath) && System.IO.File.Exists(lastManifestFilePath))
+            if (!string.IsNullOrEmpty(lastManifestFilePath) && System.IO.File.Exists(lastManifestFilePath))
             {
-                var lastManifest = Utilities.Serializer.Load<Manifest>(lastManifestFilePath);
+                var lastManifest = Utilities.Serializer.LoadFromFile<Manifest>(lastManifestFilePath);
                 foreach (var file in lastManifest.Files)
                 {
                     // 如果上一个版本的 manifest 中存在这个文件，但在当前扫描的 manifest 中不存在，说明这个文件需要被删除
@@ -50,10 +50,10 @@ namespace MinecraftUpdateAndSync.PublishTool
                     }
                 }
             }
-            Utilities.Serializer.Save($"{manifestSavePath}\\manifest-{version}.json", manifest);
+            Utilities.Serializer.SaveToFile($"{manifestSavePath}\\manifest-{version}.json", manifest);
             if (deletedFilesManifest.Files.Count > 0)
             {
-                Utilities.Serializer.Save($"{manifestSavePath}\\manifest-deleted-{version}.json", deletedFilesManifest);
+                Utilities.Serializer.SaveToFile($"{manifestSavePath}\\manifest-deleted-{version}.json", deletedFilesManifest);
             }
         }
     }

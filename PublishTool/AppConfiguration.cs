@@ -20,16 +20,16 @@ namespace MinecraftUpdateAndSync.PublishTool.Models
 
         public string VersionFile { get; set; }
     }
-    class ConfigurationModel
+    class AppConfiguration
     {
         public string MinecraftPath { get; set; }
 
         public string LogPath { get; set; }
 
         public string[] IgnoredDirectories { get; set; }
-
-        public string[] IgnoredFiles { get; set; }
-
-        public List<PublishTask> Tasks { get; set; }
+        public string LastManifestSaveDirectory { get; set; }
+        public string ManifestSaveDirectory { get; set; }
+        public string CurrentVersion { get; set; }
+        public string LastManifestSaveVersion { get; set; }
     }
 }
