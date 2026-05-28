@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MinecraftUpdateAndSync.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,14 +23,12 @@ namespace MinecraftUpdateAndSync.PublishTool.Models
     }
     class AppConfiguration
     {
-        public string MinecraftPath { get; set; }
-
-        public string LogPath { get; set; }
-
+        public string MinecraftPath { get; set; } = string.Empty;
         public string[] IgnoredDirectories { get; set; }
-        public string LastManifestSaveDirectory { get; set; }
+        public string LastManifestSavePath { get; set; }
         public string ManifestSaveDirectory { get; set; }
-        public string CurrentVersion { get; set; }
-        public string LastManifestSaveVersion { get; set; }
+        public string CurrentVersion { get; set; } = string.Empty;
+        public FileScanService.ScanMode ScanMode { get; set; } = FileScanService.ScanMode.Exclude;
+        public string[] IncludeDirectories { get; set; }
     }
 }

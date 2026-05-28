@@ -53,8 +53,8 @@ namespace MinecraftUpdateAndSync.Utilities
             LogLevel level,
             string message,
             LogDebugLevel debugLevel = LogDebugLevel.None,
-            [CallerMemberName] string memberName = "",
-            [CallerFilePath] string filePath = ""
+            string memberName = "",
+            string filePath = ""
         )
         {
             if (debugLevel <= ApplicationDebugLevel)
@@ -93,19 +93,31 @@ namespace MinecraftUpdateAndSync.Utilities
             }
         }
 
-        public static void LogWarning(string message, LogDebugLevel debugLevel)
+        public static void LogWarning(
+            string message, 
+            LogDebugLevel debugLevel, 
+            [CallerMemberName] string memberName = "", 
+            [CallerFilePath] string filePath = "")
         {
-            Log(LogLevel.Warning, message, debugLevel);
+            Log(LogLevel.Warning, message, debugLevel, memberName, filePath);
         }
 
-        public static void LogError(string message, LogDebugLevel debugLevel)
+        public static void LogError(
+            string message,
+            LogDebugLevel debugLevel,
+            [CallerMemberName] string memberName = "",
+            [CallerFilePath] string filePath = "")
         {
-            Log(LogLevel.Error, message, debugLevel);
+            Log(LogLevel.Error, message, debugLevel, memberName, filePath);
         }
 
-        public static void LogInfo(string message, LogDebugLevel debugLevel)
+        public static void LogInfo(
+            string message,
+            LogDebugLevel debugLevel,
+            [CallerMemberName] string memberName = "",
+            [CallerFilePath] string filePath = "")
         {
-            Log(LogLevel.Info, message, debugLevel);
+            Log(LogLevel.Info, message, debugLevel, memberName, filePath);
         }
     }
 }

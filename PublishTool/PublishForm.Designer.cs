@@ -30,7 +30,7 @@
         {
             this.buttonReloadConfig = new System.Windows.Forms.Button();
             this.buttonSaveConfig = new System.Windows.Forms.Button();
-            this.textBoxManifestSavePath = new System.Windows.Forms.TextBox();
+            this.textBoxManifestSaveDirectory = new System.Windows.Forms.TextBox();
             this.labelManifestSavePath = new System.Windows.Forms.Label();
             this.buttonBrowseManifestSavePath = new System.Windows.Forms.Button();
             this.buttonGenerateManifest = new System.Windows.Forms.Button();
@@ -44,13 +44,17 @@
             this.textBoxLastManifestPath = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.textBoxCurrentVersion = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.textBoxLastVersion = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.textBoxIgnoreDirectories = new System.Windows.Forms.TextBox();
+            this.buttonIgnoreDirectories = new System.Windows.Forms.Button();
+            this.radioBtnIncludeMode = new System.Windows.Forms.RadioButton();
+            this.radioBtnExcludeMode = new System.Windows.Forms.RadioButton();
+            this.buttonBrowseIncludeDirectories = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.buttonBrowseLogSavePath = new System.Windows.Forms.Button();
+            this.textBoxIncludeDirectories = new System.Windows.Forms.TextBox();
+            this.progressBar = new System.Windows.Forms.ProgressBar();
+            this.label3 = new System.Windows.Forms.Label();
+            this.labelPercent = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // buttonReloadConfig
@@ -75,12 +79,12 @@
             this.buttonSaveConfig.UseVisualStyleBackColor = true;
             this.buttonSaveConfig.Click += new System.EventHandler(this.buttonSaveConfig_Click);
             // 
-            // textBoxManifestSavePath
+            // textBoxManifestSaveDirectory
             // 
-            this.textBoxManifestSavePath.Location = new System.Drawing.Point(13, 95);
-            this.textBoxManifestSavePath.Name = "textBoxManifestSavePath";
-            this.textBoxManifestSavePath.Size = new System.Drawing.Size(323, 26);
-            this.textBoxManifestSavePath.TabIndex = 2;
+            this.textBoxManifestSaveDirectory.Location = new System.Drawing.Point(13, 95);
+            this.textBoxManifestSaveDirectory.Name = "textBoxManifestSaveDirectory";
+            this.textBoxManifestSaveDirectory.Size = new System.Drawing.Size(323, 26);
+            this.textBoxManifestSaveDirectory.TabIndex = 2;
             // 
             // labelManifestSavePath
             // 
@@ -100,6 +104,7 @@
             this.buttonBrowseManifestSavePath.TabIndex = 4;
             this.buttonBrowseManifestSavePath.Text = "浏览...";
             this.buttonBrowseManifestSavePath.UseVisualStyleBackColor = true;
+            this.buttonBrowseManifestSavePath.Click += new System.EventHandler(this.buttonBrowseManifestSavePath_Click);
             // 
             // buttonGenerateManifest
             // 
@@ -110,6 +115,7 @@
             this.buttonGenerateManifest.TabIndex = 5;
             this.buttonGenerateManifest.Text = "生成清单";
             this.buttonGenerateManifest.UseVisualStyleBackColor = true;
+            this.buttonGenerateManifest.Click += new System.EventHandler(this.buttonGenerateManifest_Click);
             // 
             // buttonBrowseMinecraftDirectory
             // 
@@ -120,6 +126,7 @@
             this.buttonBrowseMinecraftDirectory.TabIndex = 8;
             this.buttonBrowseMinecraftDirectory.Text = "浏览...";
             this.buttonBrowseMinecraftDirectory.UseVisualStyleBackColor = true;
+            this.buttonBrowseMinecraftDirectory.Click += new System.EventHandler(this.buttonBrowseMinecraftDirectory_Click);
             // 
             // labelMinecraftDirectory
             // 
@@ -150,6 +157,7 @@
             // 
             this.richTextBoxLog.Location = new System.Drawing.Point(439, 41);
             this.richTextBoxLog.Name = "richTextBoxLog";
+            this.richTextBoxLog.ReadOnly = true;
             this.richTextBoxLog.Size = new System.Drawing.Size(404, 409);
             this.richTextBoxLog.TabIndex = 10;
             this.richTextBoxLog.Text = "";
@@ -163,15 +171,16 @@
             this.buttonBrowseLastManifestPath.TabIndex = 13;
             this.buttonBrowseLastManifestPath.Text = "浏览...";
             this.buttonBrowseLastManifestPath.UseVisualStyleBackColor = true;
+            this.buttonBrowseLastManifestPath.Click += new System.EventHandler(this.buttonBrowseLastManifestPath_Click);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(12, 176);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(202, 20);
+            this.label1.Size = new System.Drawing.Size(188, 20);
             this.label1.TabIndex = 12;
-            this.label1.Text = "上一次 Manifest 文件保存目录";
+            this.label1.Text = "上一次 Manifest 文件的路径";
             // 
             // textBoxLastManifestPath
             // 
@@ -196,22 +205,6 @@
             this.textBoxCurrentVersion.Size = new System.Drawing.Size(100, 26);
             this.textBoxCurrentVersion.TabIndex = 14;
             // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(117, 228);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(79, 20);
-            this.label3.TabIndex = 17;
-            this.label3.Text = "上一次版本";
-            // 
-            // textBoxLastVersion
-            // 
-            this.textBoxLastVersion.Location = new System.Drawing.Point(121, 251);
-            this.textBoxLastVersion.Name = "textBoxLastVersion";
-            this.textBoxLastVersion.Size = new System.Drawing.Size(100, 26);
-            this.textBoxLastVersion.TabIndex = 16;
-            // 
             // label4
             // 
             this.label4.AutoSize = true;
@@ -225,47 +218,110 @@
             // 
             this.textBoxIgnoreDirectories.Location = new System.Drawing.Point(13, 303);
             this.textBoxIgnoreDirectories.Name = "textBoxIgnoreDirectories";
-            this.textBoxIgnoreDirectories.Size = new System.Drawing.Size(404, 26);
+            this.textBoxIgnoreDirectories.Size = new System.Drawing.Size(323, 26);
             this.textBoxIgnoreDirectories.TabIndex = 18;
+            // 
+            // buttonIgnoreDirectories
+            // 
+            this.buttonIgnoreDirectories.Location = new System.Drawing.Point(343, 299);
+            this.buttonIgnoreDirectories.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.buttonIgnoreDirectories.Name = "buttonIgnoreDirectories";
+            this.buttonIgnoreDirectories.Size = new System.Drawing.Size(74, 35);
+            this.buttonIgnoreDirectories.TabIndex = 20;
+            this.buttonIgnoreDirectories.Text = "浏览...";
+            this.buttonIgnoreDirectories.UseVisualStyleBackColor = true;
+            this.buttonIgnoreDirectories.Click += new System.EventHandler(this.buttonIgnoreDirectories_Click);
+            // 
+            // radioBtnIncludeMode
+            // 
+            this.radioBtnIncludeMode.AutoSize = true;
+            this.radioBtnIncludeMode.Location = new System.Drawing.Point(16, 417);
+            this.radioBtnIncludeMode.Name = "radioBtnIncludeMode";
+            this.radioBtnIncludeMode.Size = new System.Drawing.Size(83, 24);
+            this.radioBtnIncludeMode.TabIndex = 21;
+            this.radioBtnIncludeMode.TabStop = true;
+            this.radioBtnIncludeMode.Text = "包含模式";
+            this.radioBtnIncludeMode.UseVisualStyleBackColor = true;
+            // 
+            // radioBtnExcludeMode
+            // 
+            this.radioBtnExcludeMode.AutoSize = true;
+            this.radioBtnExcludeMode.Location = new System.Drawing.Point(16, 387);
+            this.radioBtnExcludeMode.Name = "radioBtnExcludeMode";
+            this.radioBtnExcludeMode.Size = new System.Drawing.Size(83, 24);
+            this.radioBtnExcludeMode.TabIndex = 22;
+            this.radioBtnExcludeMode.TabStop = true;
+            this.radioBtnExcludeMode.Text = "排除模式";
+            this.radioBtnExcludeMode.UseVisualStyleBackColor = true;
+            // 
+            // buttonBrowseIncludeDirectories
+            // 
+            this.buttonBrowseIncludeDirectories.Location = new System.Drawing.Point(343, 351);
+            this.buttonBrowseIncludeDirectories.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.buttonBrowseIncludeDirectories.Name = "buttonBrowseIncludeDirectories";
+            this.buttonBrowseIncludeDirectories.Size = new System.Drawing.Size(74, 35);
+            this.buttonBrowseIncludeDirectories.TabIndex = 25;
+            this.buttonBrowseIncludeDirectories.Text = "浏览...";
+            this.buttonBrowseIncludeDirectories.UseVisualStyleBackColor = true;
+            this.buttonBrowseIncludeDirectories.Click += new System.EventHandler(this.buttonBrowseIncludeDirectories_Click);
             // 
             // label5
             // 
             this.label5.AutoSize = true;
             this.label5.Location = new System.Drawing.Point(12, 332);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(93, 20);
-            this.label5.TabIndex = 21;
-            this.label5.Text = "日志保存路径";
+            this.label5.Size = new System.Drawing.Size(188, 20);
+            this.label5.TabIndex = 24;
+            this.label5.Text = "包含的目录列表（以 ; 分隔）";
             // 
-            // textBox1
+            // textBoxIncludeDirectories
             // 
-            this.textBox1.Location = new System.Drawing.Point(13, 355);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(323, 26);
-            this.textBox1.TabIndex = 20;
+            this.textBoxIncludeDirectories.Location = new System.Drawing.Point(13, 355);
+            this.textBoxIncludeDirectories.Name = "textBoxIncludeDirectories";
+            this.textBoxIncludeDirectories.Size = new System.Drawing.Size(323, 26);
+            this.textBoxIncludeDirectories.TabIndex = 23;
             // 
-            // buttonBrowseLogSavePath
+            // progressBar
             // 
-            this.buttonBrowseLogSavePath.Location = new System.Drawing.Point(343, 351);
-            this.buttonBrowseLogSavePath.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.buttonBrowseLogSavePath.Name = "buttonBrowseLogSavePath";
-            this.buttonBrowseLogSavePath.Size = new System.Drawing.Size(74, 35);
-            this.buttonBrowseLogSavePath.TabIndex = 22;
-            this.buttonBrowseLogSavePath.Text = "浏览...";
-            this.buttonBrowseLogSavePath.UseVisualStyleBackColor = true;
+            this.progressBar.Location = new System.Drawing.Point(121, 417);
+            this.progressBar.Name = "progressBar";
+            this.progressBar.Size = new System.Drawing.Size(296, 23);
+            this.progressBar.TabIndex = 26;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(117, 389);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(68, 20);
+            this.label3.TabIndex = 27;
+            this.label3.Text = "计算进度:";
+            // 
+            // labelPercent
+            // 
+            this.labelPercent.Location = new System.Drawing.Point(343, 391);
+            this.labelPercent.Name = "labelPercent";
+            this.labelPercent.Size = new System.Drawing.Size(74, 20);
+            this.labelPercent.TabIndex = 28;
+            this.labelPercent.Text = "0%";
+            this.labelPercent.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // PublishForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(856, 462);
-            this.Controls.Add(this.buttonBrowseLogSavePath);
+            this.Controls.Add(this.labelPercent);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.progressBar);
+            this.Controls.Add(this.buttonBrowseIncludeDirectories);
             this.Controls.Add(this.label5);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.textBoxIncludeDirectories);
+            this.Controls.Add(this.radioBtnExcludeMode);
+            this.Controls.Add(this.radioBtnIncludeMode);
+            this.Controls.Add(this.buttonIgnoreDirectories);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.textBoxIgnoreDirectories);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.textBoxLastVersion);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.textBoxCurrentVersion);
             this.Controls.Add(this.buttonBrowseLastManifestPath);
@@ -279,7 +335,7 @@
             this.Controls.Add(this.buttonGenerateManifest);
             this.Controls.Add(this.buttonBrowseManifestSavePath);
             this.Controls.Add(this.labelManifestSavePath);
-            this.Controls.Add(this.textBoxManifestSavePath);
+            this.Controls.Add(this.textBoxManifestSaveDirectory);
             this.Controls.Add(this.buttonSaveConfig);
             this.Controls.Add(this.buttonReloadConfig);
             this.Font = new System.Drawing.Font("微软雅黑", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
@@ -295,7 +351,7 @@
 
         private System.Windows.Forms.Button buttonReloadConfig;
         private System.Windows.Forms.Button buttonSaveConfig;
-        private System.Windows.Forms.TextBox textBoxManifestSavePath;
+        private System.Windows.Forms.TextBox textBoxManifestSaveDirectory;
         private System.Windows.Forms.Label labelManifestSavePath;
         private System.Windows.Forms.Button buttonBrowseManifestSavePath;
         private System.Windows.Forms.Button buttonGenerateManifest;
@@ -309,13 +365,17 @@
         private System.Windows.Forms.TextBox textBoxLastManifestPath;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox textBoxCurrentVersion;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox textBoxLastVersion;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox textBoxIgnoreDirectories;
+        private System.Windows.Forms.Button buttonIgnoreDirectories;
+        private System.Windows.Forms.RadioButton radioBtnIncludeMode;
+        private System.Windows.Forms.RadioButton radioBtnExcludeMode;
+        private System.Windows.Forms.Button buttonBrowseIncludeDirectories;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Button buttonBrowseLogSavePath;
+        private System.Windows.Forms.TextBox textBoxIncludeDirectories;
+        private System.Windows.Forms.ProgressBar progressBar;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label labelPercent;
     }
 }
 

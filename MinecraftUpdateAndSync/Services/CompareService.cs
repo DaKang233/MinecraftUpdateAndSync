@@ -205,7 +205,7 @@ namespace MinecraftUpdateAndSync.Services
             }
             else // manifest1Version is equal to manifest2Version
             {
-                return null;
+                return new List<CompareResult>();
             }
             
             foreach (var newFile in newManifestDict.Values)
@@ -218,13 +218,13 @@ namespace MinecraftUpdateAndSync.Services
                     {
                         result.RelativePath = newFile.RelativePath;
                         result.State = FileState.Same;
-                        result.Action = SyncAction.None;
+                        result.Action = GetSyncAction(result.State);
                     }
                     else
                     {
                         result.RelativePath = newFile.RelativePath;
                         result.State = FileState.Different;
-                        result.Action = SyncAction.Replace; // The file is different, we need to replace the old file with the new file.
+                        result.Action = GetSyncAction(result.State); // The file is different, we need to replace the old file with the new file.
                     }
                 }
                 else
@@ -232,7 +232,7 @@ namespace MinecraftUpdateAndSync.Services
                     // The file is missing in local manifest
                     result.RelativePath = newFile.RelativePath;
                     result.State = FileState.MissingLocal;
-                    result.Action = SyncAction.Download;
+                    result.Action = GetSyncAction(result.State);
                 }
                 compareResults.Add(result);
             }

@@ -11,30 +11,53 @@ namespace MinecraftUpdateAndSync.Services
 {
     public class FileScanService
     {
+        public enum ScanMode
+        {
+            Include,
+            Exclude
+        }
+
         /// <summary>
-        /// 扫描指定目录，并返回一个字典，其中包含所找到的所有文件的文件快照，
-        /// 排除那些位于指定忽略目录中的文件。
+        /// Scans the specified directory and returns a dictionary of file snapshots, optionally including or excluding
+        /// files based on applied rule directories and scan mode.
         /// </summary>
-        /// <remarks>位于任何指定忽略目录或其子目录中的文件将从结果中排除。
-        /// 目录匹配不区分大小写，并使用标准化后的路径，路径中的斜线为正斜杠。</remarks>
-        /// <param name="directoryPath">要扫描文件的目录的完整路径。不能为 null 或空。</param>
-        /// <param name="ignoreDirectories">一个目录路径数组，这些路径相对于根目录，将在扫描中被忽略。
-        /// 如果为 null，则不忽略任何目录。目录路径比较不区分大小写，应使用正斜杠。</param>
-        /// <returns>一个字典，将每个文件的相对路径映射到其对应的文件快照。
-        /// 如果没有找到任何文件，则该字典为空。</returns>
-        public static Dictionary<string, FileSnapshot> ScanDirectory(string directoryPath, string[] ignoreDirectories = null)
+        /// <remarks>If scanMode is ScanMode.Exclude, files within the applied rule directories are
+        /// omitted from the results. If scanMode is ScanMode.Include, only files within the applied rule directories
+        /// are included. Directory paths are normalized for comparison. This method performs a recursive scan of all
+        /// subdirectories.</remarks>
+        /// <param name="directoryPath">The full path of the directory to scan. Must not be null or empty.</param>
+        /// <param name="scanMode">Specifies whether to include or exclude files based on the applied rule directories. The default is
+        /// ScanMode.Exclude.</param>
+        /// <param name="appliedRuleDirectories">An array of directory paths used to filter files during the scan. If null or empty, all files are included.
+        /// Paths can be absolute or relative to the scanned directory.</param>
+        /// <returns>A dictionary mapping each file's relative path to its corresponding FileSnapshot. The dictionary will be
+        /// empty if no files match the criteria.</returns>
+        public static Dictionary<string, FileSnapshot> ScanDirectory(
+            string directoryPath,
+            ScanMode scanMode = ScanMode.Exclude,
+            string[] appliedRuleDirectories = null)
         {
             var directoryFiles = Directory.GetFiles(directoryPath, "*", SearchOption.AllDirectories);
             var fileSnapshots = new Dictionary<string, FileSnapshot>();
+            var normalizedAppliedRuleDirs =
+                appliedRuleDirectories?
+                    .Select(d =>
+                    {
+                        var relative =
+                            Path.IsPathRooted(d)
+                                ? PathHelper.GetRelativePath(directoryPath, d)
+                                : d;
+
+                        return relative
+                            .Replace('\\', '/')
+                            .TrimEnd('/') + "/";
+                    })
+                    .ToArray();
             foreach (var file in directoryFiles)
             {
                 var fileInfo = new FileInfo(file);
                 var relativePath = PathHelper.GetRelativePath(directoryPath, fileInfo.FullName);
                 var normalizedRelativePath = relativePath.Replace('\\', '/');
-                var normalizedIgnoreDirs =
-                    ignoreDirectories?
-                        .Select(d => d.Replace('\\', '/').TrimEnd('/') + "/")
-                        .ToArray();
                 var fileSnapshot = new FileSnapshot
                 {
                     FullPath = file,
@@ -43,14 +66,17 @@ namespace MinecraftUpdateAndSync.Services
                     // Hash = ComputeFileHash(file), // Implement this method to compute the file hash if needed
                     Size = fileInfo.Length
                 };
-                if (normalizedIgnoreDirs != null &&
-                    normalizedIgnoreDirs.Any(dir =>
-                        normalizedRelativePath.StartsWith(
-                            dir,
-                            StringComparison.OrdinalIgnoreCase)))
-                {
+                if (normalizedAppliedRuleDirs != null && 
+                    scanMode == ScanMode.Exclude ?
+                 normalizedAppliedRuleDirs.Any(dir =>
+                    normalizedRelativePath.StartsWith(
+                        dir,
+                        StringComparison.OrdinalIgnoreCase)) :
+                 !normalizedAppliedRuleDirs.Any(dir =>
+                    normalizedRelativePath.StartsWith(
+                        dir,
+                        StringComparison.OrdinalIgnoreCase)))
                     continue;
-                }
                 fileSnapshots[relativePath] = fileSnapshot;
             }
             return fileSnapshots;

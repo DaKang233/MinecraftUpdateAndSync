@@ -64,6 +64,7 @@
     <Compile Include="Services\DownloadService.cs" />
     <Compile Include="Services\FileScanService.cs" />
     <Compile Include="Utilities\HttpHelper.cs" />
+    <Compile Include="Utilities\LogHelper.cs" />
     <Compile Include="Utilities\ProcessHelper.cs" />
     <Compile Include="Utilities\SevenZipHelper.cs" />
     <Compile Include="Utilities\HashHelper.cs" />
