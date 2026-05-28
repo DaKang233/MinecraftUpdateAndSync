@@ -47,14 +47,59 @@ namespace MinecraftUpdateAndSync.Models
         /// Gets or sets the collection of manifest files associated with this instance.
         /// </summary>
         public List<ManifestFile> Files { get; set; } = new List<ManifestFile>();
+
+        /// <summary>
+        /// Compares two version strings and determines whether the first version is greater than the second version.
+        /// </summary>
+        /// <remarks>Both version strings must be valid and parseable by the Version class. If either
+        /// string is not in a valid format, a FormatException may be thrown.</remarks>
+        /// <param name="version1">The first version string to compare. Must be in a format recognized by the Version class, such as '1.2.3'.</param>
+        /// <param name="version2">The second version string to compare. Must be in a format recognized by the Version class, such as '1.2.3'.</param>
+        /// <returns>true if the first version is greater than the second version; otherwise, false.</returns>
+        public static bool CompareVersions(string version1, string version2)
+        {
+            /*
+            var v1 = version1.Split('.');
+            var v2 = version2.Split('.');
+
+            int maxLength = Math.Max(v1.Length, v2.Length);
+
+            for (int i = 0; i < maxLength; i++)
+            {
+                int n1 = i < v1.Length ? int.Parse(v1[i]) : 0;
+                int n2 = i < v2.Length ? int.Parse(v2[i]) : 0;
+
+                if (n1 > n2)
+                    return true;
+
+                if (n1 < n2)
+                    return false;
+            }
+
+            // 完全相等
+            return false;
+            */
+            return new Version(version1) > new Version(version2);
+        }
     }
 
-    public enum FileStatus
+    public enum FileState
     {
-        Ignore,
-        Delete,
-        Missing,
+        Same,
+        MissingLocal,
+        MissingRemote,
         Different,
-        Same
+        InvalidLocal,
+        InvalidRemote,
+        Ignored
+    }
+
+    public enum SyncAction
+    {
+        None,
+        Download,
+        Replace,
+        Delete,
+        Ignore
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MinecraftUpdateAndSync.Services;
+using MinecraftUpdateAndSync.Utilities;
 
 namespace MinecraftUpdateAndSync.PublishTool
 {
@@ -22,7 +23,14 @@ namespace MinecraftUpdateAndSync.PublishTool
             {
                 var fullPath = file.Value.FullPath;
                 var relativePath = file.Key;
-                var fileHash = Utilities.HashHelper.ComputeFileHash(fullPath);
+                if (HashHelper.TryComputeFileHash(fullPath, out string fileHash))
+                {
+                    file.Value.Hash = fileHash;
+                }
+                else { 
+                    LogHelper.LogError($"Failed to compute hash for file: {fullPath}", LogHelper.LogDebugLevel.None);
+                    continue;
+                }
                 scannedManifestFiles[relativePath].Hash = fileHash;
                 manifest.Files.Add(new ManifestFile
                 {

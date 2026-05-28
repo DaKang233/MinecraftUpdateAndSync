@@ -55,5 +55,20 @@ namespace MinecraftUpdateAndSync.Services
             }
             return fileSnapshots;
         }
+
+        public static Manifest GetLocalFileManifest(Dictionary<string, FileSnapshot> files, string version)
+        {
+            var manifest = new Manifest();
+            
+            manifest.Files = files.Values.Select(fs => new ManifestFile
+            {
+                RelativePath = fs.RelativePath,
+                MTime = fs.MTime,
+                Hash = fs.Hash,
+                Size = fs.Size
+            }).ToList();
+            manifest.Version = version;
+            return manifest;
+        }
     }
 }
