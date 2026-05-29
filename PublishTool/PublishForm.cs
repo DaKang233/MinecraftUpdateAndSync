@@ -132,6 +132,7 @@ namespace MinecraftUpdateAndSync.PublishTool
                         textBoxLastManifestPath.Text = config.LastManifestSavePath ?? "";
                         textBoxManifestSaveDirectory.Text = config.ManifestSaveDirectory ?? "";
                         textBoxMinecraftDirectory.Text = config.MinecraftPath ?? "";
+                        textBoxIncludeDirectories.Text = string.Join(";", config.IncludeDirectories); // 新增字段
                         LoadScanMode(config.ScanMode);
                         Log("配置文件已加载。");
                     }

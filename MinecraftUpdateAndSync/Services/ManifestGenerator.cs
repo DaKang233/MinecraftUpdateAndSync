@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MinecraftUpdateAndSync.PublishTool
+namespace MinecraftUpdateAndSync.Services
 {
     public class ManifestGenerator
     {
