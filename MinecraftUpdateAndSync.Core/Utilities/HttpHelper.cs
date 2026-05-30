@@ -1,4 +1,4 @@
-﻿using MinecraftUpdateAndSync.Models;
+﻿using MinecraftUpdateAndSync.Core.Models;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MinecraftUpdateAndSync.Utilities
+namespace MinecraftUpdateAndSync.Core.Utilities
 {
     /// <summary>
     /// HTTPS请求工具类
@@ -60,9 +60,9 @@ namespace MinecraftUpdateAndSync.Utilities
             string url,
             string savePath,
             CancellationToken cancellationToken,
-            IProgress<int> progress = null)
+            IProgress<int>? progress = null)
         {
-            HttpResponseMessage response = null;
+            HttpResponseMessage? response = null;
             CancellationTokenRegistration ctr = default;
 
             try
@@ -144,10 +144,10 @@ namespace MinecraftUpdateAndSync.Utilities
             string url,
             string filePath,
             CancellationToken cancellationToken,
-            IProgress<long> progress = null)
+            IProgress<long>? progress = null)
         {
             CancellationTokenRegistration ctr = default;
-
+            ArgumentNullException.ThrowIfNull(filePath);
             try
             {
                 var response = await _httpClient.GetAsync(
@@ -164,11 +164,16 @@ namespace MinecraftUpdateAndSync.Utilities
                 var buffer = new byte[8192];
                 long bytesDownloaded = 0;
 
+                // 确保在创建 FileStream 之前目标目录存在，避免 Path.GetDirectoryName 返回 null 引发警告/异常
+                var directory = Path.GetDirectoryName(filePath);
+                if (!string.IsNullOrEmpty(directory))
+                    Directory.CreateDirectory(directory);
+                else throw new ArgumentException("无效的文件路径，无法获取目录信息。", nameof(filePath));
+
                 using (var stream = await response.Content.ReadAsStreamAsync())
                 using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, true))
                 {
                     int bytesRead;
-                    Directory.CreateDirectory(Path.GetDirectoryName(filePath));
                     while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length, cancellationToken)) > 0)
                     {
                         cancellationToken.ThrowIfCancellationRequested();
@@ -191,19 +196,23 @@ namespace MinecraftUpdateAndSync.Utilities
                 throw;
             }
             catch (Exception ex) { throw new Exception("下载文件失败：", ex); }
+            finally
+            {
+                ctr.Dispose();
+            }
         }
 
         public class DownloadItem
         {
-            public Uri FileUri { get; set; }
-            public string FileName { get; set; }
-            public string SavePath { get; set; }
+            public required Uri FileUri { get; set; }
+            public required string FileName { get; set; }
+            public required string SavePath { get; set; }
         }
 
         public class DownloadListResult
         {
-            public List<DownloadItem> Items { get; set; }
-            public List<string> Skipped { get; set; }
+            public required List<DownloadItem> Items { get; set; }
+            public required List<string> Skipped { get; set; }
         }
 
         /// <summary>
@@ -238,7 +247,7 @@ namespace MinecraftUpdateAndSync.Utilities
 
             var downloadItems = new List<DownloadItem>();
             var skipped = new List<string>();
-            Uri baseUri = null;
+            Uri baseUri;
             try
             {
                 baseUri = new Uri($"{protocol}://{webServer}:{webPort}/");
@@ -257,7 +266,7 @@ namespace MinecraftUpdateAndSync.Utilities
 
                 try
                 {
-                    Uri finalUri;
+                    Uri? finalUri;
                     if (Uri.TryCreate(p, UriKind.Absolute, out finalUri))
                     {
                         // 已经是完整 URL
@@ -291,9 +300,11 @@ namespace MinecraftUpdateAndSync.Utilities
                     skipped.Add(p);
                 }
             }
-            DownloadListResult result = new DownloadListResult();
-            result.Items = downloadItems;
-            result.Skipped = skipped;
+            DownloadListResult result = new DownloadListResult()
+            {
+                Items = downloadItems,
+                Skipped = skipped,
+            };
             return result;
         }
 
@@ -647,7 +658,7 @@ namespace MinecraftUpdateAndSync.Utilities
         public static async Task DownloadFilesAsync(
     List<DownloadItem> downloadItems,
     CancellationToken cancellationToken,
-    IProgress<DownloadSessionProgress> progressReporter = null,
+    IProgress<DownloadSessionProgress>? progressReporter = null,
     int maxConcurrency = 3)
         {
             int totalFiles = downloadItems.Count;

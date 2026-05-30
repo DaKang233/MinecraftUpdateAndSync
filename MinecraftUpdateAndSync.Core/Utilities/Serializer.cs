@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
 
-namespace MinecraftUpdateAndSync.Utilities
+namespace MinecraftUpdateAndSync.Core.Utilities
 {
     public class Serializer
     {
@@ -29,15 +29,15 @@ namespace MinecraftUpdateAndSync.Utilities
                 throw new FileNotFoundException($"加载文件失败：{filePath}");
 
             string json = File.ReadAllText(filePath);
-            return JsonConvert.DeserializeObject<T>(json);
+            return JsonConvert.DeserializeObject<T>(json) ?? throw new ArgumentException("解析出错。");
         }
-        public static string SerializeToString<T>(T obj, JsonSerializerSettings settings = null)
+        public static string SerializeToString<T>(T obj, JsonSerializerSettings? settings = null)
         {
             return JsonConvert.SerializeObject(obj, Formatting.Indented, settings);
         }
         public static T DeserializeFromString<T>(string json) where T : class
         {
-            return JsonConvert.DeserializeObject<T>(json);
+            return JsonConvert.DeserializeObject<T>(json) ?? throw new ArgumentException("解析出错。");
         }
     }
 }

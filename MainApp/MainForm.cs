@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Microsoft.WindowsAPICodePack.Shell;
-using MinecraftUpdateAndSync.Models;
-using MinecraftUpdateAndSync.Utilities;
-using static MinecraftUpdateAndSync.Utilities.LogHelper;
+using MinecraftUpdateAndSync.Core.Models;
+using MinecraftUpdateAndSync.Core.Utilities;
+using static MinecraftUpdateAndSync.Core.Utilities.LogHelper;
 
 namespace MinecraftUpdateAndSync
 {
@@ -30,9 +30,9 @@ namespace MinecraftUpdateAndSync
             LoadConfig();
         }
 
-        protected override void OnClosed(EventArgs e)
+        protected override void OnFormClosed(FormClosedEventArgs e)
         {
-            base.OnClosed(e);
+            base.OnFormClosed(e);
             SaveConfig();
         }
 

@@ -1,5 +1,5 @@
-﻿using MinecraftUpdateAndSync.Utilities;
-using Newtonsoft.Json; // 推荐使用 Newtonsoft.Json（.NET Framework兼容性好）
+﻿using MinecraftUpdateAndSync.Core.Utilities;
+using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Reflection;
@@ -7,12 +7,12 @@ using System.Runtime.CompilerServices;
 using System.Xml;
 using Formatting = Newtonsoft.Json.Formatting;
 
-namespace MinecraftUpdateAndSync.Models
+namespace MinecraftUpdateAndSync.Core.Models
 {
     public class Configuration
     {
         private static readonly string ConfigPath = Path.Combine(AppContext.BaseDirectory, "config.json");
-        private static ConfigurationData _currentConfig;
+        private static ConfigurationData? _currentConfig;
         public const string INSTRUCTION_CONFIG_NAME = "instruction_config.json";
         public const string INSTRUCTION_CONFIG_URL = "https://furina.dakang233.com:8443/www/minecraft/instruction/"+INSTRUCTION_CONFIG_NAME;
 
@@ -33,11 +33,11 @@ namespace MinecraftUpdateAndSync.Models
         {
             public string GameDirectory { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),".minecraft");
             public bool AutoUpdate { get; set; } = false;
-            public string InstructionConfigPath { get; set; }
+            public string? InstructionConfigPath { get; set; }
             public string ServerAddress { get; set; } = "https://mc.dakang233.com";
         }
 
-        public static ConfigurationData LoadConfiguration(IProgress<LogHelper.ProcessMessage> progress = null)
+        public static ConfigurationData LoadConfiguration(IProgress<LogHelper.ProcessMessage>? progress = null)
         {
             if (!File.Exists(ConfigPath))
             {
@@ -51,7 +51,7 @@ namespace MinecraftUpdateAndSync.Models
             {
                 string json = File.ReadAllText(ConfigPath);
                 _currentConfig = JsonConvert.DeserializeObject<ConfigurationData>(json);
-                return _currentConfig;
+                return _currentConfig ?? throw new Exception("配置文件内容无效，无法解析为ConfigurationData对象。");
             }
             catch (Exception ex) 
             {

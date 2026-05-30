@@ -1,18 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using Microsoft.WindowsAPICodePack.Dialogs;
+﻿using Microsoft.WindowsAPICodePack.Dialogs;
+using MinecraftUpdateAndSync.Contracts;
 using MinecraftUpdateAndSync.Models;
 using MinecraftUpdateAndSync.PublishTool.Models;
 using MinecraftUpdateAndSync.Services;
 using MinecraftUpdateAndSync.Utilities;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using static MinecraftUpdateAndSync.Utilities.LogHelper;
 
 namespace MinecraftUpdateAndSync.PublishTool
 {
@@ -32,10 +36,12 @@ namespace MinecraftUpdateAndSync.PublishTool
         protected override void OnClosing(CancelEventArgs e)
         {
             base.OnClosing(e);
+            /*
             if (MessageBox.Show("确定要退出吗？", "确认退出", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.No)
             {
                 e.Cancel = true;
             }
+            */
         }
 
         protected override void OnClosed(EventArgs e)
@@ -45,22 +51,15 @@ namespace MinecraftUpdateAndSync.PublishTool
             SaveConfig();
         }
 
-        private enum LogLevel
-        {
-            Info,
-            Warning,
-            Error
-        }
-
         private void FolderChooseDialog(string description, TextBox textBox)
         {
-            using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
+            using (var dialog = new CommonOpenFileDialog())
             {
-                folderBrowserDialog.Description = description;
-                folderBrowserDialog.ShowNewFolderButton = true;
-                if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
+                dialog.IsFolderPicker = true;
+                dialog.Title = description;
+                if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
                 {
-                    textBox.Text = folderBrowserDialog.SelectedPath;
+                    textBox.Text = dialog.FileName;
                 }
             }
         }
@@ -79,9 +78,9 @@ namespace MinecraftUpdateAndSync.PublishTool
         }
 
         private void Log(
-            string message, 
-            LogLevel level = LogLevel.Info, 
-            [CallerMemberName] string memberName = "", 
+            string message,
+            LogLevel level = LogLevel.Info,
+            [CallerMemberName] string memberName = "",
             [CallerFilePath] string filePath = "")
         {
             switch (level)
@@ -117,6 +116,37 @@ namespace MinecraftUpdateAndSync.PublishTool
             }
         }
 
+        private void LoadProtocol(Protocol protocol)
+        {
+            switch (protocol)
+            {
+                case Protocol.Http:
+                    radioBtnHttpProtocol.Checked = true;
+                    break;
+                case Protocol.Https:
+                    radioBtnHttpsProtocol.Checked = true;
+                    break;
+                case Protocol.Ftp:
+                    radioBtnFtpProtocol.Checked = true;
+                    break;
+                case Protocol.Sftp:
+                    radioBtnSftpProtocol.Checked = true;
+                    break;
+                default:
+                    radioBtnHttpsProtocol.Checked = true;
+                    break;
+            }
+        }
+
+        private Protocol GetSelectedProtocol()
+        {
+            if (radioBtnHttpProtocol.Checked) return Protocol.Http;
+            if (radioBtnHttpsProtocol.Checked) return Protocol.Https;
+            if (radioBtnFtpProtocol.Checked) return Protocol.Ftp;
+            if (radioBtnSftpProtocol.Checked) return Protocol.Sftp;
+            return Protocol.Https; // 默认
+        }
+
         private void LoadConfig()
         {
             try
@@ -125,6 +155,7 @@ namespace MinecraftUpdateAndSync.PublishTool
                 if (System.IO.File.Exists(configPath))
                 {
                     var config = Serializer.LoadFromFile<Models.AppConfiguration>(configPath);
+                    var instructionConfig = config.Instruction ?? new UpdateInstruction();
                     if (config != null)
                     {
                         textBoxCurrentVersion.Text = config.CurrentVersion ?? "";
@@ -134,6 +165,18 @@ namespace MinecraftUpdateAndSync.PublishTool
                         textBoxMinecraftDirectory.Text = config.MinecraftPath ?? "";
                         textBoxIncludeDirectories.Text = string.Join(";", config.IncludeDirectories); // 新增字段
                         LoadScanMode(config.ScanMode);
+
+                        // 加载指导文件相关配置
+                        textBoxFileServerRootPath.Text = config.FileServerRootPath ?? "";
+                        textBoxInstructionConfigPath.Text = config.InstructionConfigPath ?? "";
+
+                        textBoxInstructionVersion.Text = instructionConfig.Version ?? "";
+                        textBoxPrefix.Text = instructionConfig.Prefix ?? "";
+                        textBoxResourceRelativeDirectory.Text = instructionConfig.ResourceRelativeDirectory ?? "";
+                        textBoxServerAddress.Text = instructionConfig.ServerAddress ?? "";
+                        textBoxServerPort.Text = instructionConfig.ServerPort.ToString() ?? "";
+                        checkBoxAllowDeletion.Checked = instructionConfig.AllowDelete;
+                        LoadProtocol(instructionConfig.Protocol);
                         Log("配置文件已加载。");
                     }
                     else Log("配置文件 publish_config.json 格式不正确，无法加载。", LogLevel.Error);
@@ -156,8 +199,21 @@ namespace MinecraftUpdateAndSync.PublishTool
                     ManifestSaveDirectory = textBoxManifestSaveDirectory.Text,
                     MinecraftPath = textBoxMinecraftDirectory.Text,
                     ScanMode = GetScanMode(),
-                    IncludeDirectories = textBoxIncludeDirectories.Text.Split(';') // 新增字段
+                    IncludeDirectories = textBoxIncludeDirectories.Text.Split(';'), // 新增字段
+                    InstructionConfigPath = textBoxInstructionConfigPath.Text,
+                    FileServerRootPath = textBoxFileServerRootPath.Text,
+                    Instruction = new UpdateInstruction
+                    {
+                        Version = textBoxInstructionVersion.Text,
+                        Prefix = textBoxPrefix.Text,
+                        ResourceRelativeDirectory = textBoxResourceRelativeDirectory.Text,
+                        ServerAddress = textBoxServerAddress.Text,
+                        ServerPort = int.TryParse(textBoxServerPort.Text, out int port) ? port : 0,
+                        AllowDelete = checkBoxAllowDeletion.Checked,
+                        Protocol = GetSelectedProtocol()
+                    }
                 };
+
                 Serializer.SaveToFile(configPath, config);
                 Log("配置文件已保存。");
             }
@@ -189,7 +245,7 @@ namespace MinecraftUpdateAndSync.PublishTool
 
         private void buttonBrowseLastManifestPath_Click(object sender, EventArgs e)
         {
-            FileChooseDialog("选择上一个清单文件所在目录", textBoxLastManifestPath);
+            FileChooseDialog("选择上一个清单文件", textBoxLastManifestPath);
         }
 
         private void buttonIgnoreDirectories_Click(object sender, EventArgs e)
@@ -209,15 +265,23 @@ namespace MinecraftUpdateAndSync.PublishTool
 
         private async void buttonGenerateManifest_Click(object sender, EventArgs e)
         {
+            if (string.IsNullOrEmpty(textBoxManifestSaveDirectory.Text)) 
+            { Log("请指定 Manifest 保存目录。",LogLevel.Warning); return; };
+            if (string.IsNullOrEmpty(textBoxMinecraftDirectory.Text)) 
+            { Log("请指定 Minecraft 安装目录。", LogLevel.Warning); return; };
+            if (string.IsNullOrEmpty(textBoxCurrentVersion.Text)) 
+            { Log("请指定当前版本号。", LogLevel.Warning); return; };
+            if (Version.TryParse(textBoxCurrentVersion.Text, out var version) == false) 
+            { Log("版本号格式不正确，请输入有效的版本号。", LogLevel.Warning); return; }
             Log("正在生成清单文件...");
             try
             {
                 buttonGenerateManifest.Enabled = false;
                 var progress = new Progress<int>(p => { progressBar.Value = p; Log($"生成进度: {p}%"); labelPercent.Text = $"{p}%"; });
-                await GenerateManifest(progress);
+                await GenerateManifestAsync(progress);
                 Log("清单文件已生成: " + System.IO.Path.Combine(textBoxManifestSaveDirectory.Text, $"manifest-{textBoxCurrentVersion.Text}.json"));
             }
-            catch (Exception ex) { Log("清单文件生成时遇到错误:"+ex.Message); }
+            catch (Exception ex) { Log("清单文件生成时遇到错误:" + ex.Message); }
             finally
             {
                 buttonGenerateManifest.Enabled = true;
@@ -231,7 +295,7 @@ namespace MinecraftUpdateAndSync.PublishTool
             return FileScanService.ScanMode.Exclude; // 默认
         }
 
-        private async Task GenerateManifest(Progress<int> progress)
+        private async Task GenerateManifestAsync(Progress<int> progress)
         {
             await Task.Run(() =>
             {
@@ -260,6 +324,77 @@ namespace MinecraftUpdateAndSync.PublishTool
                     textBoxIncludeDirectories.Text = string.Join(";", selectedPaths);
                 }
             }
+        }
+
+        private void buttonInstructionConfigPath_Click(object sender, EventArgs e)
+        {
+            FolderChooseDialog("选择指导文件配置路径", textBoxInstructionConfigPath);
+        }
+
+        private void buttonFileServerPathBrowse_Click(object sender, EventArgs e)
+        {
+            FolderChooseDialog("选择文件服务器路径", textBoxFileServerRootPath);
+        }
+
+        private void buttonResourceRelativeDirectoryBrowse_Click(object sender, EventArgs e)
+        {
+            FolderChooseDialog("选择资源相对目录", textBoxResourceRelativeDirectory);
+        }
+
+        private async void buttonGenerateInstruction_Click(object sender, EventArgs e)
+        {
+            var version = textBoxInstructionVersion.Text;
+            var prefix = textBoxPrefix.Text;
+            var resourceRelativeDirectory = textBoxResourceRelativeDirectory.Text;
+            var serverAddress = textBoxServerAddress.Text;
+            var serverPortText = textBoxServerPort.Text;
+            var fileServerRootPath = textBoxFileServerRootPath.Text;
+            var instructionConfigPath = textBoxInstructionConfigPath.Text;
+            if (string.IsNullOrEmpty(version) || 
+                string.IsNullOrEmpty(prefix) || 
+                string.IsNullOrEmpty(resourceRelativeDirectory) || 
+                string.IsNullOrEmpty(serverAddress) || 
+                string.IsNullOrEmpty(serverPortText) || 
+                string.IsNullOrEmpty(fileServerRootPath) ||
+                string.IsNullOrEmpty(instructionConfigPath))
+            {
+                Log("请确保所有指导文件配置项都已填写。", LogLevel.Warning);
+                return;
+            }
+            try
+            {
+                await GenerateInstructionAsync();
+                Log($"指导文件已生成到目录下:{instructionConfigPath}", LogLevel.Info);
+            }
+            catch (Exception ex) { Log($"生成指导文件时出错:{ex.Message}", LogLevel.Error); }
+        }
+
+        private async Task GenerateInstructionAsync()
+        {
+            var rootPath = textBoxFileServerRootPath.Text;
+            var resourceRelativeDirectory = textBoxResourceRelativeDirectory.Text;
+            var version = textBoxInstructionVersion.Text;
+            await Task.Run(() =>
+            {
+                var instructionConfig = new UpdateInstruction()
+                {
+                    Version = textBoxInstructionVersion.Text,
+                    Prefix = textBoxPrefix.Text,
+                    ResourceRelativeDirectory = PathHelper.GetNormalizedPath(PathHelper.GetRelativePath(rootPath,resourceRelativeDirectory)),
+                    ServerAddress = textBoxServerAddress.Text,
+                    ServerPort = int.TryParse(textBoxServerPort.Text, out int port) ? port : 0,
+                    AllowDelete = checkBoxAllowDeletion.Checked,
+                    Protocol = GetSelectedProtocol(),
+                    ManifestPath = PathHelper.GetRelativePath(rootPath,textBoxManifestPath.Text)
+                };
+                if (!Directory.Exists(textBoxInstructionConfigPath.Text)) Directory.CreateDirectory(textBoxInstructionConfigPath.Text);
+                Serializer.SaveToFile(System.IO.Path.Combine(textBoxInstructionConfigPath.Text,Configuration.INSTRUCTION_CONFIG_NAME), instructionConfig);
+            });
+        }
+
+        private void buttonManifestDirectoryBrowse_Click(object sender, EventArgs e)
+        {
+            FileChooseDialog("选择清单文件保存目录", textBoxManifestPath);
         }
     }
 }

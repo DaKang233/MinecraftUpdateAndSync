@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -33,6 +33,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.WindowsAPICodePack">
+      <HintPath>..\packages\Microsoft-WindowsAPICodePack-Core.1.1.5\lib\net472\Microsoft.WindowsAPICodePack.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.Shell">
+      <HintPath>..\packages\Microsoft-WindowsAPICodePack-Shell.1.1.5\lib\net472\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -49,28 +55,33 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\Configuration.cs" />
-    <Compile Include="Models\FileSnapshot.cs" />
+    <Compile Include="Contracts\UpdateInstruction.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Models\Configuration.cs" />
+    <Compile Include="Models\DownloadFileProgress.cs" />
+    <Compile Include="Models\DownloadSessionProgress.cs" />
+    <Compile Include="Models\DownloadState.cs" />
+    <Compile Include="Models\FileSnapshot.cs" />
     <Compile Include="Models\Manifest.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\CompareService.cs" />
     <Compile Include="Services\DownloadService.cs" />
     <Compile Include="Services\FileScanService.cs" />
+    <Compile Include="Services\ManifestGenerator.cs" />
+    <Compile Include="Services\UpdateService.cs" />
+    <Compile Include="Utilities\HashHelper.cs" />
     <Compile Include="Utilities\HttpHelper.cs" />
     <Compile Include="Utilities\LogHelper.cs" />
-    <Compile Include="Utilities\ProcessHelper.cs" />
-    <Compile Include="Utilities\SevenZipHelper.cs" />
-    <Compile Include="Utilities\HashHelper.cs" />
     <Compile Include="Utilities\PathHelper.cs" />
+    <Compile Include="Utilities\ProcessHelper.cs" />
     <Compile Include="Utilities\Serializer.cs" />
-    <Compile Include="Services\UpdateService.cs" />
+    <Compile Include="Utilities\SevenZipHelper.cs" />
     <Compile Include="Utilities\Utilities.cs" />
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>

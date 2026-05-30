@@ -1,4 +1,6 @@
 <Solution>
-  <Project Path="MinecraftUpdateAndSync/MainApp.csproj" Id="55ec9b65-1a41-4f2b-8e46-4468a75a924d" />
+  <Project Path="MainApp/MinecraftUpdateAndSync.MainApp.csproj" Id="cc8c1e37-9706-4fef-b5d5-0177dbf095ab" />
+  <Project Path="MinecraftUpdateAndSync.Core/MinecraftUpdateAndSync.Core.csproj" Id="e3d07081-1807-4c7d-bf1e-de46561eff9b" />
+  <Project Path="MinecraftUpdateAndSync/MainApp.NETF4.7.2.csproj" Id="55ec9b65-1a41-4f2b-8e46-4468a75a924d" />
   <Project Path="PublishTool/PublishTool.csproj" Id="3607d570-2652-49f3-a17e-4fe8dae51f07" />
 </Solution>

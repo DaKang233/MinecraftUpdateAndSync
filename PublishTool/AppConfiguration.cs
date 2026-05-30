@@ -7,22 +7,9 @@ using System.Threading.Tasks;
 
 namespace MinecraftUpdateAndSync.PublishTool.Models
 {
-    class PublishTask
-    {
-        public string Name { get; set; }
-
-        public string OutputPath { get; set; }
-
-        public string Mode { get; set; }
-
-        public string Type { get; set; }
-
-        public string Version { get; set; }
-
-        public string VersionFile { get; set; }
-    }
     class AppConfiguration
     {
+        // 生成 Manifest 文件配置项
         public string MinecraftPath { get; set; } = string.Empty;
         public string[] IgnoredDirectories { get; set; }
         public string LastManifestSavePath { get; set; }
@@ -30,5 +17,10 @@ namespace MinecraftUpdateAndSync.PublishTool.Models
         public string CurrentVersion { get; set; } = string.Empty;
         public FileScanService.ScanMode ScanMode { get; set; } = FileScanService.ScanMode.Exclude;
         public string[] IncludeDirectories { get; set; }
+
+        // 指令文件配置项
+        public Contracts.UpdateInstruction Instruction { get; set; }
+        public string InstructionConfigPath { get; set; }
+        public string FileServerRootPath { get; set; }
     }
 }

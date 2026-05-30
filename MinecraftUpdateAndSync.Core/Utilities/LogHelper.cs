@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MinecraftUpdateAndSync.Utilities
+namespace MinecraftUpdateAndSync.Core.Utilities
 {
     public class LogHelper
     {
@@ -133,10 +133,10 @@ namespace MinecraftUpdateAndSync.Utilities
         {
             try
             {
-                string logDirectory =
+                string? logDirectory =
                     Path.GetDirectoryName(LogFilePath);
 
-                if (!Directory.Exists(logDirectory))
+                if (!string.IsNullOrEmpty(logDirectory) && !Directory.Exists(logDirectory))
                 {
                     Directory.CreateDirectory(logDirectory);
                 }

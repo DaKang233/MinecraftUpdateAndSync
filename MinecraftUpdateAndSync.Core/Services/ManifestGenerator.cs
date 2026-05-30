@@ -1,6 +1,6 @@
-﻿using MinecraftUpdateAndSync.Models;
-using MinecraftUpdateAndSync.Services;
-using MinecraftUpdateAndSync.Utilities;
+﻿using MinecraftUpdateAndSync.Core.Models;
+using MinecraftUpdateAndSync.Core.Services;
+using MinecraftUpdateAndSync.Core.Utilities;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MinecraftUpdateAndSync.Services
+namespace MinecraftUpdateAndSync.Core.Services
 {
     public class ManifestGenerator
     {
@@ -35,10 +35,10 @@ namespace MinecraftUpdateAndSync.Services
             string directoryPath,
             string manifestSavePath,
             string version,
-            string lastManifestFilePath = null,
+            string? lastManifestFilePath = null,
             FileScanService.ScanMode scanMode = FileScanService.ScanMode.Exclude,
-            IProgress<int> progress = null,
-            string[] appliedRuleDirectories = null)
+            IProgress<int>? progress = null,
+            string[]? appliedRuleDirectories = null)
         {
             if (!Version.TryParse(version, out var normalizedVersion))
             {

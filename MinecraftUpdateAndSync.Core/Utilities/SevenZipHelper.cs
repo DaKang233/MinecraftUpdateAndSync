@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MinecraftUpdateAndSync.Utilities
+namespace MinecraftUpdateAndSync.Core.Utilities
 {
     /// <summary>
     /// The exception that is thrown when an operation requires a password-protected archive to be accessed without
@@ -63,7 +63,7 @@ namespace MinecraftUpdateAndSync.Utilities
         /// project tools directory. The search order determines which path is returned if multiple copies
         /// exist.</remarks>
         /// <returns>A string containing the full path to 7z.exe if found in a known directory; otherwise, null.</returns>
-        public static string Default7ZipFullPath()
+        public static string? Default7ZipFullPath()
         {
             var sevenZipPath = Path.Combine(
                 AppContext.BaseDirectory,
@@ -80,7 +80,7 @@ namespace MinecraftUpdateAndSync.Utilities
                 "7z.exe"
             );
             var sevenZipVSProjectPath = Path.Combine(
-                Directory.GetParent(Directory.GetParent(Environment.CurrentDirectory).FullName).FullName,
+                Directory.GetParent(Directory.GetParent(Environment.CurrentDirectory)!.FullName)!.FullName, // 获取上两级目录
                 "tools",
                 "7z.exe");
             Debug.WriteLine($"检测 7z.exe 路径：\n{sevenZipPath}\n{sevenZipCurrentDirPath}\n{sevenZipProgramFilesPath}\n{sevenZipVSProjectPath}");
@@ -109,7 +109,7 @@ namespace MinecraftUpdateAndSync.Utilities
         /// <summary>
         /// 异步下载 7z.exe 和 7z.dll
         /// </summary>
-        public static async Task Download7ZipExe(CancellationToken cancellationToken, IProgress<int> progress = null)
+        public static async Task Download7ZipExe(CancellationToken cancellationToken, IProgress<int>? progress = null)
         {
             var sevenZipExeUrl = "https://furina.dakang233.com:8443/www/tools/7z.exe";
             var sevenZipDllUrl = "https://furina.dakang233.com:8443/www/tools/7z.dll";
@@ -143,7 +143,7 @@ namespace MinecraftUpdateAndSync.Utilities
             }
         }
 
-        public static async Task Download7ZipExeToDirectory(CancellationToken cancellationToken, string directory, IProgress<int> progress = null)
+        public static async Task Download7ZipExeToDirectory(CancellationToken cancellationToken, string directory, IProgress<int>? progress = null)
         {
             var sevenZipExeUrl = "https://furina.dakang233.com:8443/www/tools/7z.exe";
             var sevenZipDllUrl = "https://furina.dakang233.com:8443/www/tools/7z.dll";
@@ -232,9 +232,9 @@ namespace MinecraftUpdateAndSync.Utilities
         public static async Task ExtractAsync(
             string archivePath,
             string outputDirectory,
-            string sevenZipExe = null,
-            IProgress<int> progress = null,
-            string password = null,
+            string? sevenZipExe = null,
+            IProgress<int>? progress = null,
+            string? password = null,
             OverwriteMode overwriteMode = OverwriteMode.OverwriteAll,
             CancellationToken cancellationToken = default,
             params string[] includeFiles)
