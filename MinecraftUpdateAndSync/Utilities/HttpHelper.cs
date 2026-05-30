@@ -1,4 +1,4 @@
-﻿using MinecraftUpdateAndSync.Models;
+using MinecraftUpdateAndSync.Models;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -893,3 +893,4 @@ namespace MinecraftUpdateAndSync.Utilities
         }
     }
 }
+

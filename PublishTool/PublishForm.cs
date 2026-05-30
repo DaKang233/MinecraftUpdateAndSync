@@ -1,4 +1,4 @@
-﻿using Microsoft.WindowsAPICodePack.Dialogs;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using MinecraftUpdateAndSync.Contracts;
 using MinecraftUpdateAndSync.Models;
 using MinecraftUpdateAndSync.PublishTool.Models;
@@ -398,3 +398,4 @@ namespace MinecraftUpdateAndSync.PublishTool
         }
     }
 }
+

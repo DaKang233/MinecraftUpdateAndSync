@@ -1,4 +1,4 @@
-﻿using MinecraftUpdateAndSync.Core.Utilities;
+using MinecraftUpdateAndSync.Core.Utilities;
 using Newtonsoft.Json;
 using System;
 using System.IO;
@@ -70,3 +70,4 @@ namespace MinecraftUpdateAndSync.Core.Models
         }
     }
 }
+

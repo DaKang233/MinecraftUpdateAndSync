@@ -1,4 +1,4 @@
-﻿using MinecraftUpdateAndSync.Utilities;
+using MinecraftUpdateAndSync.Utilities;
 using Newtonsoft.Json; // 推荐使用 Newtonsoft.Json（.NET Framework兼容性好）
 using System;
 using System.IO;
@@ -70,3 +70,4 @@ namespace MinecraftUpdateAndSync.Models
         }
     }
 }
+

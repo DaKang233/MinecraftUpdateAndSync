@@ -1,4 +1,4 @@
-﻿namespace MinecraftUpdateAndSync
+namespace MinecraftUpdateAndSync
 {
     partial class MainForm
     {
@@ -397,4 +397,5 @@
         private System.Windows.Forms.Label label6;
     }
 }
+
 

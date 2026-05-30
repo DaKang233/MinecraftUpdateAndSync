@@ -1,4 +1,4 @@
-﻿namespace MinecraftUpdateAndSync
+namespace MinecraftUpdateAndSync
 {
     internal static class Program
     {
@@ -15,3 +15,4 @@
         }
     }
 }
+

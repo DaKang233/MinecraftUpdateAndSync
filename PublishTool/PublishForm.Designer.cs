@@ -1,4 +1,4 @@
-﻿namespace MinecraftUpdateAndSync.PublishTool
+namespace MinecraftUpdateAndSync.PublishTool
 {
     partial class PublishForm
     {
@@ -740,4 +740,5 @@
         private System.Windows.Forms.Button buttonManifestPath;
     }
 }
+
 

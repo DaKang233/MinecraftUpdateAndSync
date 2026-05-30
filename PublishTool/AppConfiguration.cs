@@ -1,4 +1,4 @@
-﻿using MinecraftUpdateAndSync.Services;
+using MinecraftUpdateAndSync.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,3 +24,4 @@ namespace MinecraftUpdateAndSync.PublishTool.Models
         public string FileServerRootPath { get; set; }
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using MinecraftUpdateAndSync.Models;
+using MinecraftUpdateAndSync.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -254,3 +254,4 @@ namespace MinecraftUpdateAndSync.Services
         }
     }
 }
+

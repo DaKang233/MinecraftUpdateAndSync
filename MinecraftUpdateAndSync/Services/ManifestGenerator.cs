@@ -1,4 +1,4 @@
-﻿using MinecraftUpdateAndSync.Models;
+using MinecraftUpdateAndSync.Models;
 using MinecraftUpdateAndSync.Services;
 using MinecraftUpdateAndSync.Utilities;
 using System;
@@ -143,3 +143,4 @@ namespace MinecraftUpdateAndSync.Services
         }
     }
 }
+
