@@ -48,7 +48,7 @@ namespace MinecraftUpdateAndSync.Core.Services
 
             var manifest = new Manifest { Version = normalizedVersion.ToString() };
             var deletedFilesManifest = new Manifest { Version = normalizedVersion.ToString() };
-            var scannedFiles = FileScanService.ScanDirectory(directoryPath, scanMode, appliedRuleDirectories);
+            var scannedFiles = FileScanService.ScanDirectory(directoryPath, scanMode, null, null, appliedRuleDirectories);
 
             // 使用线程安全集合收集结果
             var manifestFilesBag = new ConcurrentBag<ManifestFile>();

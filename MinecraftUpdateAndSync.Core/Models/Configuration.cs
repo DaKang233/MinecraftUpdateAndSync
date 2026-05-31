@@ -15,6 +15,7 @@ namespace MinecraftUpdateAndSync.Core.Models
         private static ConfigurationData? _currentConfig;
         public const string INSTRUCTION_CONFIG_NAME = "instruction_config.json";
         public const string INSTRUCTION_CONFIG_URL = "https://furina.dakang233.com:8443/www/minecraft/instruction/"+INSTRUCTION_CONFIG_NAME;
+        public const string LOCAL_FILE_MANIFEST_NAME = "local_file_manifest.json";
 
         public static ConfigurationData Current
         {
@@ -33,10 +34,11 @@ namespace MinecraftUpdateAndSync.Core.Models
         {
             public string GameDirectory { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),".minecraft");
             public bool AutoUpdate { get; set; } = false;
-            public string? InstructionConfigPath { get; set; }
+            public string InstructionConfigPath { get; set; } = Path.Combine(AppContext.BaseDirectory, INSTRUCTION_CONFIG_NAME);
             public string ServerAddress { get; set; } = "https://mc.dakang233.com";
+            public string LocalManifestPath { get; set; } = Path.Combine(AppContext.BaseDirectory, LOCAL_FILE_MANIFEST_NAME);
         }
-
+        
         public static ConfigurationData LoadConfiguration(IProgress<LogHelper.ProcessMessage>? progress = null)
         {
             if (!File.Exists(ConfigPath))
